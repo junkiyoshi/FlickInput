@@ -6,6 +6,7 @@ Button btn_bs;
 Guide guide;
 
 LeapMotion leap;
+PVector finger_position;
 boolean finger_pressed;
 
 void setup()
@@ -36,6 +37,7 @@ void setup()
   guide = new Guide();
   
   leap = new LeapMotion(this);
+  finger_position = new PVector(0, 0);
   finger_pressed = false;
 }
 
@@ -52,16 +54,15 @@ void draw()
     btns[i].display();
   }  
   
-  guide.display(mouseX, mouseY);
-  
-  /*
+  guide.display(finger_position.x, finger_position.y);
+    
   for(Hand hand : leap.getHands())
   {
     if(hand.isRight())
     {
       Finger index_f = hand.getIndexFinger();
       PVector index_position = index_f.getPosition().copy();
-      index_position.add(0, 100, 0);
+      index_position.add(0, 0, 0);
       for(int i = 0; i < btns.length; i++)
       {
         btns[i].overCheck(index_position.x, index_position.y);
@@ -72,7 +73,12 @@ void draw()
         finger_pressed = true;
         for(int i = 0; i < btns.length; i++)
         {
-          btns[i].pressedCheck(index_position.x, index_position.y);
+          if(btns[i].pressedCheck(index_position.x, index_position.y))
+          {
+            guide.setLocation(btns[i].location.x, btns[i].location.y);
+            guide.setStrings(btns[i].values);
+            guide.visible = true;
+          }
         } 
       }
       
@@ -83,15 +89,21 @@ void draw()
         {
           btns[i].released(index_position.x, index_position.y);
         } 
+        guide.visible = false;
       }
       
-      stroke(0, 0, 200);
+      finger_position = index_position.copy();
+      
+      if(index_position.z > 50)
+      {
+        stroke(0, 0, 200);
+      }else{
+        stroke(200, 0, 0);
+      }
       noFill();
       ellipse(index_position.x, index_position.y, index_position.z, index_position.z);
-      println("x = " + index_position.x + " y = " + index_position.y + " z = " + index_position.z);
     }
   }  
-  */
 }
 
 void mousePressed()
